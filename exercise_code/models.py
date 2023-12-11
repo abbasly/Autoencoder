@@ -1,7 +1,12 @@
 import torch
 import torch.nn as nn
 import numpy as np
+import torch.nn.init as init
 
+def init_weights(m):
+        if type(m) == nn.Linear:
+            init.xavier_uniform_(m.weight)
+            m.bias.data.fill_(0.01)
 class Encoder(nn.Module):
 
     def __init__(self, hparams, input_size=28 * 28, latent_dim=20):
@@ -22,6 +27,9 @@ class Encoder(nn.Module):
             nn.LeakyReLU(),
             nn.Linear(64, latent_dim)
         )
+
+        # self.encoder.apply(init_weights)
+
         ########################################################################
         # TODO: Initialize your encoder!                                       #                                       
         #                                                                      #
@@ -45,6 +53,8 @@ class Encoder(nn.Module):
         #                           END OF YOUR CODE                           #
         ########################################################################
 
+    
+            
     def forward(self, x):
         # feed x into encoder!
         return self.encoder(x)
@@ -68,7 +78,7 @@ class Decoder(nn.Module):
             nn.LeakyReLU(),
             # nn.Dropout(0.3),
             nn.Linear(128, output_size),
-            nn.Sigmoid()  # Sigmoid is often used to scale values between 0 and 1 for image data
+            # nn.Sigmoid()  # Sigmoid is often used to scale values between 0 and 1 for image data
         )
         ########################################################################
         # TODO: Initialize your decoder!                                       #
@@ -203,7 +213,6 @@ class Classifier(nn.Module):
         )
         self.device = hparams.get("device", torch.device("cuda" if torch.cuda.is_available() else "cpu"))
 
-        self.set_optimizer()
         ########################################################################
         # TODO:                                                                #
         # Given an Encoder, finalize your classifier, by adding a classifier   #   
