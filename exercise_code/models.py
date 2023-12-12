@@ -9,7 +9,7 @@ def init_weights(m):
             m.bias.data.fill_(0.01)
 class Encoder(nn.Module):
 
-    def __init__(self, hparams, input_size=28 * 28, latent_dim=20):
+    def __init__(self, hparams, input_size=28 * 28, latent_dim=10):
         super().__init__()
 
         # set hyperparams
@@ -19,13 +19,15 @@ class Encoder(nn.Module):
         self.encoder = None
 
         self.encoder = nn.Sequential(
-            nn.Linear(input_size, 128),
+            nn.Linear(input_size, 256),
+            nn.BatchNorm1d(256),
+            nn.LeakyReLU(),
+            # nn.Dropout(0.5),
+            nn.Linear(256, 128),
             nn.BatchNorm1d(128),
             nn.LeakyReLU(),
-            nn.Linear(128, 64),
-            nn.BatchNorm1d(64),
-            nn.LeakyReLU(),
-            nn.Linear(64, latent_dim)
+            # nn.Dropout(0.5),
+            nn.Linear(128, latent_dim)
         )
 
         # self.encoder.apply(init_weights)
@@ -61,7 +63,7 @@ class Encoder(nn.Module):
 
 class Decoder(nn.Module):
 
-    def __init__(self, hparams, latent_dim=20, output_size=28 * 28):
+    def __init__(self, hparams, latent_dim=10, output_size=28 * 28):
         super().__init__()
 
         # set hyperparams
@@ -69,15 +71,15 @@ class Decoder(nn.Module):
         self.decoder = None
 
         self.decoder = nn.Sequential(
-            nn.Linear(latent_dim, 64),
-            nn.BatchNorm1d(64),
-            nn.LeakyReLU(),
-            # nn.Dropout(0.3),
-            nn.Linear(64, 128),
+            nn.Linear(latent_dim, 128),
             nn.BatchNorm1d(128),
             nn.LeakyReLU(),
-            # nn.Dropout(0.3),
-            nn.Linear(128, output_size),
+            # nn.Dropout(0.5),
+            nn.Linear(128, 256),
+            nn.BatchNorm1d(256),
+            nn.LeakyReLU(),
+            # nn.Dropout(0.5),
+            nn.Linear(256, output_size),
             # nn.Sigmoid()  # Sigmoid is often used to scale values between 0 and 1 for image data
         )
         ########################################################################
@@ -204,11 +206,11 @@ class Classifier(nn.Module):
             nn.Linear(encoder.latent_dim, 128),
             nn.BatchNorm1d(128),
             nn.LeakyReLU(),
-            nn.Dropout(0.5),
+            # nn.Dropout(0.3),
             nn.Linear(128, 64),
             nn.BatchNorm1d(64),
             nn.LeakyReLU(),
-            nn.Dropout(0.5),
+            # nn.Dropout(0.3),
             nn.Linear(64, 10)
         )
         self.device = hparams.get("device", torch.device("cuda" if torch.cuda.is_available() else "cpu"))
