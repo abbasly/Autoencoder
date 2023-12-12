@@ -203,15 +203,15 @@ class Classifier(nn.Module):
         self.hparams = hparams
         self.encoder = encoder
         self.model = nn.Sequential(
-            nn.Linear(encoder.latent_dim, 128),
+            nn.Linear(encoder.latent_dim, 256),
+            nn.BatchNorm1d(256),
+            nn.LeakyReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, 128),
             nn.BatchNorm1d(128),
             nn.LeakyReLU(),
-            # nn.Dropout(0.3),
-            nn.Linear(128, 64),
-            nn.BatchNorm1d(64),
-            nn.LeakyReLU(),
-            # nn.Dropout(0.3),
-            nn.Linear(64, 10)
+            nn.Dropout(0.3),
+            nn.Linear(128, 10)
         )
         self.device = hparams.get("device", torch.device("cuda" if torch.cuda.is_available() else "cpu"))
 
