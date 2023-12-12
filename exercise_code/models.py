@@ -19,15 +19,15 @@ class Encoder(nn.Module):
         self.encoder = None
 
         self.encoder = nn.Sequential(
-            nn.Linear(input_size, 256),
+            nn.Linear(input_size, 512),
+            nn.BatchNorm1d(512),
+            nn.LeakyReLU(),
+            # nn.Dropout(0.5),
+            nn.Linear(512, 256),
             nn.BatchNorm1d(256),
             nn.LeakyReLU(),
             # nn.Dropout(0.5),
-            nn.Linear(256, 128),
-            nn.BatchNorm1d(128),
-            nn.LeakyReLU(),
-            # nn.Dropout(0.5),
-            nn.Linear(128, latent_dim)
+            nn.Linear(256, latent_dim)
         )
 
         # self.encoder.apply(init_weights)
@@ -71,15 +71,15 @@ class Decoder(nn.Module):
         self.decoder = None
 
         self.decoder = nn.Sequential(
-            nn.Linear(latent_dim, 128),
-            nn.BatchNorm1d(128),
-            nn.LeakyReLU(),
-            # nn.Dropout(0.5),
-            nn.Linear(128, 256),
+            nn.Linear(latent_dim, 256),
             nn.BatchNorm1d(256),
             nn.LeakyReLU(),
             # nn.Dropout(0.5),
-            nn.Linear(256, output_size),
+            nn.Linear(256, 512),
+            nn.BatchNorm1d(512),
+            nn.LeakyReLU(),
+            # nn.Dropout(0.5),
+            nn.Linear(512, output_size),
             # nn.Sigmoid()  # Sigmoid is often used to scale values between 0 and 1 for image data
         )
         ########################################################################
